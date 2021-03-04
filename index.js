@@ -11,7 +11,7 @@ function start() {
             type: 'list',
             message: 'What would you like to do?',
             name: 'a',
-            choices: ["View All Employees", "View All Employees By Department", "View All Employees By Manager", "Add Employee", "Remove Employee", "Update Employee Role", "Update Manager", "View All Roles", "Add Role", "Remove Role", "View All Departments", "Add Department", "Remove Department", "Quit"]
+            choices: ["View All Employees", "View All Employees By Department", "View All Employees By Manager", "Add Employee", "Update Employee Role", "View All Roles", "Add Role", "View All Departments", "Add Department", "Quit"]
         }
     ]).then (response => {
         switch (response.a){
@@ -27,33 +27,33 @@ function start() {
             case "Add Employee":
                 addEmployee();
                 break;
-            case "Remove Employee":
-                removeEmployee();
-                break;
+            // case "Remove Employee":
+            //     removeEmployee();
+            //     break;
             case "Update Employee Role":
                 updateEmployeeRole();
                 break;
-            case "Update Manager":
-                updateManager();
-                break;
+            // case "Update Manager":
+            //     updateManager();
+            //     break;
             case "View All Roles":
                 allRoles();
                 break;
             case "Add Role":
                 addRoles();
                 break;
-            case "Remove Role":
-                removeRole();
-                break;
+            // case "Remove Role":
+            //     removeRole();
+            //     break;
             case "View All Departments":
                 allDepartments();
                 break;
             case "Add Department":
                 addDepartment();
                 break;
-            case "Remove Department":
-                removeDepartment();
-                break;
+            // case "Remove Department":
+            //     removeDepartment();
+            //     break;
             case "Quit":
                 db.quit();
         }
@@ -90,9 +90,21 @@ function byDepartment() {
 }
 
 function byManager() {
-    db.byManager().then(result => {
-        console.table(result);
-        start();
+    db.byManager().then(data => {
+        const choices = data.map((dep) => ({ name: dep.first_name, value: dep.id }));
+        inquirer.prompt([
+            {
+                type: 'list',
+                message: 'Which manager would you like to see employees for?',
+                name: 'manager',
+                choices: choices
+            }
+        ]).then (response => {
+            db.managerN(response.manager).then(result => {
+                console.table(result);
+                start();
+            });
+        });
     });
 }
 
@@ -199,30 +211,32 @@ function addEmployee(){
     })
 }
 
+
+
 function updateEmployeeRole(){
     db.viewAllEmployees().then(data => {
-        const choices = data.map((dep) => ({ name: dep.name, value: dep.id }));
+        const choices = data.map((dep) => ({ name: dep.first_name }));
 
-        db.viewAllEmployees().then(dat => {
-            const c = dat.map((de) => ({ name: de.name, value: de.id }));
+        db.allRoles().then(dat => {
+            const role = dat.map((de) => ({ name: de.title, value: de.id }));
 
             inquirer.prompt([
                 {
-                    type: 'choice',
+                    type: 'list',
                     message: 'Which employee needs to be updated?',
-                    name: 'last',
-                    choices:  choices
+                    name: 'first',
+                    choices: choices
                 },
                 {
-                    type: 'choice',
+                    type: 'list',
                     message: 'What is their new role?',
-                    name: 'id',
-                    choices: c
+                    name: 'r',
+                    choices: role
                 }
             ]).then (response => {
-                const id = response.id;
-                const name = response.last
-                db.updateEmployeeRole(id, name).then(result => {
+                const name = response.first;
+                const r = response.r;
+                db.updateEmployeeRole(r, name).then(result => {
                     start();
                 });
             });

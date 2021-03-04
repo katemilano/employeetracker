@@ -19,7 +19,7 @@ class DB {
     }
 
     managerN(input){
-      return this.connection.query('SELECT * FROM employee where first_name = "?"', [input]);
+      return this.connection.query('SELECT * FROM employee where manager_id = "?"', [input]);
     }
 
     managerNames(){
@@ -66,16 +66,22 @@ class DB {
     )};
 
     updateEmployeeRole(id, name){
-      return this.connection.query('UPDATE employee SET role_id = ? WHERE last_name = ?', [id, name])
+      return this.connection.query(
+        'UPDATE employee SET ? WHERE ?',
+        [
+          {
+            role_id: id,
+          },
+          {
+            first_name: name,
+          },
+        ])
     };
 
 
     quit() {
       connection.end();
     }
-
-
-    //remove
 
 }
 
