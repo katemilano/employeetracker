@@ -32,6 +32,8 @@ Running the application
 
 ## Video
 
+Demo
+https://drive.google.com/file/d/1P61dwWumBBuYPPN-8hOWZxznqdFwM7fL/view?usp=sharing
 
 ## License
 
