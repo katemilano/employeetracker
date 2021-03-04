@@ -157,9 +157,9 @@ function addRoles(){
 
 function addEmployee(){
     db.allRoles().then(data => {
-        const choices = data.map((dep) => ({ name: dep.name, value: dep.id }));
-        db.managerNames().then(d => {
-            const man = d.map((man) => ({ name: man.name, value: man.id }));
+        const choices = data.map((dep) => ({ name: dep.title, value: dep.id }));
+        db.byManager().then(d => {
+            const man = d.map((man) => ({ name: man.first_name, value: man.id }));
 
             inquirer.prompt([
                 {
@@ -185,20 +185,49 @@ function addEmployee(){
                     choices: man
                 }
             ]).then (response => {
-                const manager = response.manager;
-                db.managerN(manager).then(result => {
-                    const id = result;
-                    const r = response.role;
-                    db.managerN(r).then(r => {
-                        const role = r; 
-                        const first = response.first;
-                        const last = response.last;
-                        db.addRoles(first, last, role, id).then(result => {
-                            start();
-                        });
-                    });
+                const manager = response.manager.toString();
+                const role = response.role; 
+                const first = response.first;
+                const last = response.last;
+                const id = manager;
+
+                db.addEmployee(first, last, role, id).then(result => {
+                    start();
                 });
             });
         })
     })
 }
+
+function updateEmployeeRole(){
+    db.viewAllEmployees().then(data => {
+        const choices = data.map((dep) => ({ name: dep.name, value: dep.id }));
+
+        db.viewAllEmployees().then(dat => {
+            const c = dat.map((de) => ({ name: de.name, value: de.id }));
+
+            inquirer.prompt([
+                {
+                    type: 'choice',
+                    message: 'Which employee needs to be updated?',
+                    name: 'last',
+                    choices:  choices
+                },
+                {
+                    type: 'choice',
+                    message: 'What is their new role?',
+                    name: 'id',
+                    choices: c
+                }
+            ]).then (response => {
+                const id = response.id;
+                const name = response.last
+                db.updateEmployeeRole(id, name).then(result => {
+                    start();
+                });
+            });
+        });
+    });
+}
+
+    

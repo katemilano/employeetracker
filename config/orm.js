@@ -18,12 +18,12 @@ class DB {
         return this.connection.query('SELECT * FROM employee where manager_id IS NULL');
     }
 
-    managerN(manager){
-      return this.connection.query('SELECT manager_id FROM employee where first_name = ?', [manager]);
+    managerN(input){
+      return this.connection.query('SELECT * FROM employee where first_name = "?"', [input]);
     }
 
-    managerNames(man){
-      return this.connection.query('SELECT first_name FROM employee where manager_id IS NULL');
+    managerNames(){
+      return this.connection.query('SELECT first_name, id FROM employee where manager_id IS NULL');
     }
 
 
@@ -38,28 +38,6 @@ class DB {
         )
       }
 
-
-    updateManager(){
-        console.log('Updating all Rocky Road quantities...\n');
-        const query = connection.query(
-          'UPDATE products SET ? WHERE ?',
-          [
-            {
-              quantity: 100,
-            },
-            {
-              flavor: 'Rocky Road',
-            },
-          ],
-          (err, res) => {
-            if (err) throw err;
-            console.log(`${res.affectedRows} products updated!\n`);
-            // Call deleteProduct AFTER the UPDATE completes
-            deleteProduct();
-          }
-        );
-
-    };
 
     allRoles(){
         return this.connection.query('SELECT * FROM role');
