@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 ## Description
-
+This application allows you to keep a employee tracking system that stores information such as employee's first and last names, roles, department, salary of roles, and managers. In this application you are able to view all employees; view by manager or department; add employees, roles, and departments; and update employee roles.
 
 ## Table of Content
 
@@ -27,8 +27,8 @@ npm i
 ```
 
 ## Photos
-Running through the terminal questions
-
+Running the application
+<img src="images/Screen Shot 2021-03-04 at 3.07.31 PM.png">
 
 ## Video
 
