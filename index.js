@@ -1,5 +1,6 @@
 const inquirer = require("inquirer");
 const mysql = require("mysql");
+// const { addDepartment } = require("./config/orm");
 const db = require("./config/orm");
 require('console.table');
 // const { DB } = require("repl");
@@ -61,6 +62,7 @@ function start() {
 
 start();
 
+//good
 function viewAllEmployees() {
     db.viewAllEmployees().then(result => {
         console.table(result);
@@ -71,7 +73,6 @@ function viewAllEmployees() {
 function byDepartment() {
     db.allDepartments().then(data => {
         const choices = data.map((dep) => ({ name: dep.name, value: dep.id }));
-
         inquirer.prompt([
             {
                 type: 'list',
@@ -88,4 +89,116 @@ function byDepartment() {
     });
 }
 
+function byManager() {
+    db.byManager().then(result => {
+        console.table(result);
+        start();
+    });
+}
 
+function allRoles() {
+    db.allRoles().then(result => {
+        console.table(result);
+        start();
+    });
+}
+
+function allDepartments(){
+    db.allDepartments().then(result => {
+        console.table(result);
+        start();
+    });
+}
+
+
+function addDepartment() {
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What department do you want to add?',
+            name: 'department'
+        }
+    ]).then (response => {
+        const dep = response.department;
+        db.addDepartment(dep).then(result => {
+            // console.table(result);
+            start();
+        });
+    });
+}
+
+function addRoles(){
+    inquirer.prompt([
+        {
+            type: 'input',
+            message: 'What role do you want to add?',
+            name: 'role'
+        },
+        {
+            type: 'input',
+            message: 'What is the salary of this role?',
+            name: 'salary'
+        },
+        {
+            type: 'input',
+            message: 'What department id of this role?',
+            name: 'id'
+        }
+    ]).then (response => {
+        const role = response.role;
+        const sal = response.salary;
+        const id = response.id;
+        db.addRoles(role, sal, id).then(result => {
+            start();
+        });
+    });
+
+}
+
+function addEmployee(){
+    db.allRoles().then(data => {
+        const choices = data.map((dep) => ({ name: dep.name, value: dep.id }));
+        db.managerNames().then(d => {
+            const man = d.map((man) => ({ name: man.name, value: man.id }));
+
+            inquirer.prompt([
+                {
+                    type: 'input',
+                    message: 'What is the first name of the employee?',
+                    name: 'first',
+                },
+                {
+                    type: 'input',
+                    message: 'What is the last name of the employee?',
+                    name: 'last',
+                },
+                {
+                    type: 'list',
+                    message: 'What is the employees role?',
+                    name: 'role',
+                    choices: choices
+                },
+                {
+                    type: 'list',
+                    message: 'Who is the employees manager?',
+                    name: 'manager',
+                    choices: man
+                }
+            ]).then (response => {
+                const manager = response.manager;
+                db.managerN(manager).then(result => {
+                    const id = result;
+                    const r = response.role;
+                    db.managerN(r).then(r => {
+                        const role = r; 
+                        const first = response.first;
+                        const last = response.last;
+                        db.addRoles(first, last, role, id).then(result => {
+                            start();
+                        });
+                    });
+                });
+            });
+        })
+    })
+}

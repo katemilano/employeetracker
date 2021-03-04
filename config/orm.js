@@ -11,105 +11,33 @@ class DB {
 
     byDepartment(id){
       return this.connection.query(
-        'SELECT id, first_name, last_name FROM employee INNER JOIN department ON employee.id = department.id where department.id = ?', [id]);
-    };
+        'SELECT * FROM employee INNER JOIN department ON employee.id = department.id where department.id = ?', [id]);
+    }
 
     byManager(){
-        return this.connection.query('SELECT department FROM employees');
-    };
+        return this.connection.query('SELECT * FROM employee where manager_id IS NULL');
+    }
 
-    addEmployee(){
-        this.connection.query('SELECT * FROM employee', (err, results) => {
-            if (err) throw err;
-            // once you have the items, prompt the user for which they'd like to bid on
-            inquirer
-              .prompt([
-                
-                {
-                    type: 'input',
-                    message: 'What is the first name of the employee?',
-                    name: 'first',
-                },
-                {
-                    type: 'input',
-                    message: 'What is the last name of the employee?',
-                    name: 'last',
-                },
-                {
-                    type: 'list',
-                    message: 'What is the employees role?',
-                    name: 'role',
-                    choices: ["Sales Lead", "Salesperson", "Software Engineer", "Account Manager", "Accountant", "Legal Team Lead"]
-                },
-                {
-                    type: 'list',
-                    message: 'Who is the employees manager?',
-                    name: 'manager',
-                    choices() {
-                        const choiceArray = [];
-                        results.forEach(({ manager_id }) => {
-                          choiceArray.push(manager_id);
-                        });
-                        return choiceArray;
-                    } 
-                }
-              ])
-              .then((answer) => {
+    managerN(manager){
+      return this.connection.query('SELECT manager_id FROM employee where first_name = ?', [manager]);
+    }
 
-                // get the information of the chosen item
-                if (answer.role === "Sales Lead" || "Salesperson"){
-
-                    this.connection.query(
-                        'INSERT INTO employee SET ?',
-                        {
-                          first_name: `${answer.first}`,
-                          last_name: `${answer.last}`,
-                          role_id: "1",
-                        },
-                        (err, res) => {
-                          if (err) throw err;
-                          console.log(`${answer.first} ${answer.last} was added!\n`);
-
-                        }
-                    )
-
-                }else if(answer.role === "Software Engineer"){
-
-                }else if(answer.role === "Legal Team Lead"){
-
-                }else {
-
-                }
-              })
-            })
-    };
+    managerNames(man){
+      return this.connection.query('SELECT first_name FROM employee where manager_id IS NULL');
+    }
 
 
-    removeEmployee(){
-
-    };
-
-    updateEmployeeRole(){
-        console.log('Updating all Rocky Road quantities...\n');
-        const query = connection.query(
-          'UPDATE products SET ? WHERE ?',
-          [
+    addEmployee(first, last, role, id){
+        return this.connection.query('INSERT INTO employee SET ?',
             {
-              quantity: 100,
-            },
-            {
-              flavor: 'Rocky Road',
-            },
-          ],
-          (err, res) => {
-            if (err) throw err;
-            console.log(`${res.affectedRows} products updated!\n`);
-            // Call deleteProduct AFTER the UPDATE completes
-            deleteProduct();
-          }
-        );
+              first_name: first,
+              last_name: last,
+              role_id: role,
+              manager_id: id
+            }
+        )
+      }
 
-    };
 
     updateManager(){
         console.log('Updating all Rocky Road quantities...\n');
@@ -134,88 +62,35 @@ class DB {
     };
 
     allRoles(){
-        return this.connection.query(
-            'SELECT * FROM role', (err, res) => {
-                if (err) throw err;
+        return this.connection.query('SELECT * FROM role');
+    }
 
-                console.log(res);
-                connection.end();
-            });
-    };
-
-
-
-    addRoles(){
-        this.connection.query('SELECT * FROM role', (err, results) => {
-            if (err) throw err;
-            // once you have the items, prompt the user for which they'd like to bid on
-            inquirer
-              .prompt([
-                {
-                    type: 'input',
-                    message: 'What role do you want to add?',
-                    name: 'role',
-                }
-              ])
-              .then((answer) => {
-                    this.connection.query(
-                        'INSERT INTO role SET ?',
-                        {
-                          name: `${answer.role}`
-                        },
-                        (err, res) => {
-                          if (err) throw err;
-                          console.log(`${answer.first} ${answer.last} was added!\n`);
-
-                        }
-
-                    )}
-            )}
+    addRoles(role, sal, id){
+      return this.connection.query(
+        'INSERT INTO role SET ?',
+        {
+          title: role,
+          salary: sal,
+          department_id: id
+        }, 
     )};
- 
-
-
-
-    removeRole(){
-
-    };
 
     allDepartments(){
         return this.connection.query('SELECT * FROM department');
     };
 
-    addDepartment(){
-        this.connection.query('SELECT * FROM department', (err, results) => {
-            if (err) throw err;
-            // once you have the items, prompt the user for which they'd like to bid on
-            inquirer
-              .prompt([
-                {
-                    type: 'input',
-                    message: 'What department do you want to add?',
-                    name: 'department',
-                }
-              ])
-              .then((answer) => {
-                    this.connection.query(
-                        'INSERT INTO department SET ?',
-                        {
-                          name: `${answer.department}`
-                        },
-                        (err, res) => {
-                          if (err) throw err;
-                          console.log(`${answer.first} ${answer.last} was added!\n`);
-
-                        }
-
-                    )}
-            )}
+    addDepartment(dep){
+      return this.connection.query(
+        'INSERT INTO department SET ?',
+        {
+          name: dep
+        }, 
     )};
 
-
-    removeDepartment(){
-
+    updateEmployeeRole(id, name){
+      return this.connection.query('UPDATE employee SET role_id = ? WHERE last_name = ?', [id, name])
     };
+
 
     quit() {
       connection.end();
